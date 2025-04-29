@@ -1,14 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
 import { ThemeContext } from './contexts/ThemeContext';
 
-function App() {
-  // Context’ten tema bilgisini ve toggle fonksiyonunu çek
-  const { theme, toggleTheme } = useContext(ThemeContext);
+// lazy import
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
 
-  // Tema’ya göre stil
+function App() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const navStyle = {
     background: theme === 'light' ? '#f0f0f0' : '#333',
     color: theme === 'light' ? '#000' : '#fff',
@@ -26,10 +25,13 @@ function App() {
         </button>
       </nav>
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
+      {/* Kod bölme: lazy yüklemeyi sarmala */}
+      <Suspense fallback={<div style={{ textAlign: 'center' }}>Yükleniyor...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
